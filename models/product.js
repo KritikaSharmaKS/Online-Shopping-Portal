@@ -11,6 +11,6 @@ module.exports = class Product{
     }
 
     static fetchAll(){
-        return this.products
+        return products
     }
 }
