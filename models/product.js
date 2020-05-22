@@ -13,7 +13,14 @@ module.exports = class Product{
         //products.push(this);
         const p = path.join(path.dirname(process.mainModule.filename),'data','products.json');
         fs.readFile(p, (err, fileContent) => {
-            console.log(err);
+            let products = [];
+            if(!err){
+                products = JSON.parse(fileContent); //takes incoming json and parse it to js object/array
+            }
+            products.push(this);
+            fs.writeFile(p, JSON.stringify(products), err => {
+                console.log(err);
+            });
         });
 
     }
