@@ -10,19 +10,21 @@ module.exports = class Product{
     }
 
     save(){
-        //products.push(this);
-        const p = path.join(path.dirname(process.mainModule.filename),'data','products.json');
-        fs.readFile(p, (err, fileContent) => {
+        const p = path.join(
+            path.dirname(process.mainModule.filename),
+            'data',
+            'products.json'
+          );
+          fs.readFile(p, (err, fileContent) => {
             let products = [];
-            if(!err){
-                products = JSON.parse(fileContent); //takes incoming json and parse it to js object/array
+            if (!err) {
+              products = JSON.parse(fileContent);
             }
             products.push(this);
             fs.writeFile(p, JSON.stringify(products), err => {
-                console.log(err);
+              console.log(err);
             });
-        });
-
+          });
     }
 
     static fetchAll(){
