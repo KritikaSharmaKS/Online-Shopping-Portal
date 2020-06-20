@@ -15,24 +15,24 @@ const p = path.join(
             if(!err){
                 cart = JSON.parse(fileContent);
             }
-        });
-        // Analyze the cart => Finding existing product
-        const existingProductIndex = cart.products.findIndex(prod => prod.id === id);
-        const existingProduct = cart.products[existingProductIndex];
-        let updatedProduct;
-        //Add new product or increase quantity 
-        if(existingProduct){
-            updatedProduct = { ...existingProduct};
-            updatedProduct.qty = updatedProduct.qty + 1;
-            cart.products = [...cart.products];
-            cart.products[existingProductIndex] = updatedProduct;
-        }else{
-            updatedProduct = {id : id, qty : 1};
-            cart.products = [...cart.products, updatedProduct];
-        }
-        cart.totalPrice = cart.totalPrice + productPrice;
-        fs.writeFile(p, JSON.stringify(cart), (err) => {
-            console.error(err);
+            // Analyze the cart => Finding existing product
+            const existingProductIndex = cart.products.findIndex(prod => prod.id === id);
+            const existingProduct = cart.products[existingProductIndex];
+            let updatedProduct;
+            //Add new product or increase quantity 
+            if(existingProduct){
+                updatedProduct = { ...existingProduct};
+                updatedProduct.qty = updatedProduct.qty + 1;
+                cart.products = [...cart.products];
+                cart.products[existingProductIndex] = updatedProduct;
+            }else{
+                updatedProduct = {id : id, qty : 1};
+                cart.products = [...cart.products, updatedProduct];
+            }
+            cart.totalPrice = cart.totalPrice + +productPrice;
+            fs.writeFile(p, JSON.stringify(cart), (err) => {
+                console.error(err);
+            });
         });
     }
   };
