@@ -45,6 +45,7 @@ exports.getAddProduct = (req, res, next) => {
     const updatedPrice = req.body.price;
     const updatedProduct = new Product(prodId, updatedTitle, updatedImageUrl, updatedDescription, updatedPrice);
     updatedProduct.save();
+    res.redirect('/admin/products');
   };
 
   exports.getProducts = (req, res, next) => {
