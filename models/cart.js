@@ -35,4 +35,20 @@ const p = path.join(
             });
         });
     }
+
+    static deleteProduct(id, productPrice){
+        fs.readFile(p, (err, fileContent) => {
+            if(err){
+                return;
+            }
+            const updatedCart = { ...cart };
+            const product = updatedCart.find(prod => prod.id === id);
+            updatedCart.products = updatedCart.products.filter(prod => prod.id !== id);
+            updatedCart.totalPrice = updatedCart.totalPrice -  product.qty * productPrice;
+            fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
+                console.error(err);
+            });
+        });
+    }
+
   };
