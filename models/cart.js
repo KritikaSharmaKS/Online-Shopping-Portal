@@ -41,7 +41,7 @@ const p = path.join(
             if(err){
                 return;
             }
-            const updatedCart = { ...cart };
+            const updatedCart = { ...fileContent };
             const product = updatedCart.find(prod => prod.id === id);
             updatedCart.products = updatedCart.products.filter(prod => prod.id !== id);
             updatedCart.totalPrice = updatedCart.totalPrice -  product.qty * productPrice;
