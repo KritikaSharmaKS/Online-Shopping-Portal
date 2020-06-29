@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const e = require('express');
 
 const p = path.join(
     path.dirname(process.mainModule.filename),
@@ -48,6 +49,17 @@ const p = path.join(
             fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
                 console.error(err);
             });
+        });
+    }
+
+    static getCart(cb){
+        fs.readFile(p, (err, fileContent) => {
+            const cart = JSON.parse(fileContent);
+            if(err){
+                cb(null);
+            }else{
+                cb(cart);
+            }
         });
     }
 
