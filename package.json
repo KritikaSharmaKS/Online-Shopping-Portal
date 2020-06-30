@@ -9,6 +9,7 @@
     "start-server": "node app.js"
   },
   "author": "Maximilian Schwarzmüller",
+  "nodemonConfig": {  "ignore": ["data/products.json"] },
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.3"
