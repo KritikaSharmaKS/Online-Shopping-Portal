@@ -44,6 +44,9 @@ const p = path.join(
             }
             const updatedCart = { ...JSON.parse(fileContent) };
             const product = updatedCart.products.find(prod => prod.id === id);
+            if(!product){
+                return;
+            }
             updatedCart.products = updatedCart.products.filter(prod => prod.id !== id);
             updatedCart.totalPrice = updatedCart.totalPrice -  product.qty * productPrice;
             fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
