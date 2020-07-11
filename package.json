@@ -9,7 +9,11 @@
     "start-server": "node app.js"
   },
   "author": "Maximilian Schwarzmüller",
-  "nodemonConfig": {  "ignore": ["data/products.json"] },
+  "nodemonConfig": {
+    "ignore": [
+      "data/products.json"
+    ]
+  },
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.3"
@@ -19,6 +23,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
+    "mysql2": "^2.1.0",
     "pug": "^2.0.3"
   }
 }
