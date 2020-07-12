@@ -1,5 +1,7 @@
 const Product = require('../models/product');
 
+const db = require('../util/database');
+
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
