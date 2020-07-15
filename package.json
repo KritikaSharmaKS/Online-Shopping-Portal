@@ -8,7 +8,7 @@
     "start": "nodemon app.js",
     "start-server": "node app.js"
   },
-  "author": "Maximilian Schwarzmüller",
+  "author": "Kritika Sharma",
   "nodemonConfig": {
     "ignore": [
       "data/products.json"
