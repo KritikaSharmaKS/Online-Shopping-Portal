@@ -14,14 +14,6 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
-// sequelize.execute('SELECT * FROM products')
-//     .then((result) => {
-//         console.log(result[0], result[1]);
-//     })
-//     .catch(err => {
-//         console.log(err);
-//     });
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -33,7 +25,7 @@ app.use(errorController.get404);
 sequelize
     .sync() //create tables in db based on your models
     .then(result => {
-        console.log(result);
+        //console.log(result);
         app.listen(3000);
     })
     .catch(err => {
