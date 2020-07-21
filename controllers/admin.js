@@ -39,7 +39,7 @@ exports.getEditProduct = (req, res, next) => {
       path: '/admin/edit-product',
       editing: editMode,
       product: product
-    })
+    });
   })  
   .catch(err => console.log(err));
 };
