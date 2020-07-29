@@ -55,6 +55,9 @@ sequelize
         return user; //already  wrapped into a Promise as inside a then block
     })
     .then(user => {
+        user.createCart();
+    })
+    .then(cart => {
         app.listen(3000);
     })
     .catch(err => {
