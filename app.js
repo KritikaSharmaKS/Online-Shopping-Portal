@@ -30,7 +30,16 @@ User.hasMany(Product);
 sequelize
     .sync() //create tables in db based on your models
     .then(result => {
+        return User.findById(1);
         //console.log(result);
+    })
+    .then(user => {
+        if(!user){
+            return User.create({ name: 'KS', email: 'test@test.com' });
+        }
+        return user; //already  wrapped into a Promise as inside a then block
+    })
+    .then(user => {
         app.listen(3000);
     })
     .catch(err => {
