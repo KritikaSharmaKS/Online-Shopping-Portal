@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById(1)
+    User.findByPk(1)
         .then(user => {
             req.user = user;
             next();
@@ -48,9 +48,9 @@ User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
-    .sync() //create tables in db based on your models
+    .sync({force: true}) //create tables in db based on your models
     .then(result => {
-        return User.findById(1);
+        return User.findByPk(1);
         //console.log(result);
     })
     .then(user => {
