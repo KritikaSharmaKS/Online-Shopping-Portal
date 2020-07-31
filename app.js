@@ -48,7 +48,7 @@ User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
-    .sync({force: true}) //create tables in db based on your models
+    .sync() //create tables in db based on your models
     .then(result => {
         return User.findByPk(1);
         //console.log(result);
