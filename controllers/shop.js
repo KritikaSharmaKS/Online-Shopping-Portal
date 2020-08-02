@@ -77,10 +77,10 @@ exports.postCart = (req, res, next) => {
     })
     .then(products => {
       let product;
-      if(products.length > 0){
+      if (products.length > 0) {
         product = products[0];
       }
-      if(product){
+      if (product) {
         //if there is an existing product => retrieve it and increment the quantity 
         const oldQuantity = product.cartItem.quantity;
         newQuantity = oldQuantity + 1;
@@ -103,7 +103,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.user
     .getCart()
     .then(cart => {
-      return cart.getProducts({ where: { id: prodId }});
+      return cart.getProducts({ where: { id: prodId } });
     })
     .then(products => {
       const product = products[0];
@@ -116,30 +116,39 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    pageTitle: 'Your Orders',
-    path: '/orders'
-  });
+  req.user.getOrders()
+    .then(orders => {
+      res.render('shop/orders', {
+        pageTitle: 'Your Orders',
+        path: '/orders'
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postOrder = (req, res, next) => {
- req.user.getCart()
-  .then(cart => {
-    return cart.getProducts();
-  })
-  .then(products => {
-    req.user
-      .createOrder()
-      .then(order => {
-        order.addProducts(products.map(product => {
-          product.orderItem = { quantity: product.cartItem.quantity };
-          return product;
-        }));
-      })
-      .catch(err => console.log(err));
-  })
-  .then(result => res.redirect('/orders'))
-  .catch(err => console.log(err));
+  let fetchedCart;
+  req.user.getCart()
+    .then(cart => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then(products => {
+      req.user
+        .createOrder()
+        .then(order => {
+          order.addProducts(products.map(product => {
+            product.orderItem = { quantity: product.cartItem.quantity };
+            return product;
+          }));
+        })
+        .catch(err => console.log(err));
+    })
+    .then(result => {
+      return fetchedCart.setProducts(null);
+    })
+    .then(result => result.redirect('/orders'))
+    .catch(err => console.log(err));
 };
 
 exports.getCheckout = (req, res, next) => {
