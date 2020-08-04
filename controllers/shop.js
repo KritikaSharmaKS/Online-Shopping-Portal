@@ -116,11 +116,13 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user.getOrders()
+  req.user
+    .getOrders({include: ['products']})
     .then(orders => {
       res.render('shop/orders', {
+        path: '/orders',
         pageTitle: 'Your Orders',
-        path: '/orders'
+        orders: orders
       });
     })
     .catch(err => console.log(err));
