@@ -20,13 +20,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
     User.findById('5f3978644a538e59210f30d0')
-        .then(user => {
-            req.user = user;
-            next();
-        })
-        .catch(err => console.log(err));
-    next();    
-});
+      .then(user => {
+        req.user = user;
+        next();
+      })
+      .catch(err => console.log(err));
+  });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
