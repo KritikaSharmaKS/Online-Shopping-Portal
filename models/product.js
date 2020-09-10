@@ -61,7 +61,7 @@ class Product {
       });
   }
 
-  static delete(prodId){
+  static delete(prodId) {
     const db = getDb();
     return db
       .collection('products')

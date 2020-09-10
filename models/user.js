@@ -1,15 +1,15 @@
-const mongodb = require('mongodb');
 const getDb = require('../util/database').getDb;
+const { ObjectId } = require('mongodb');
 
 class User {
   constructor(username, email, cart, id) {
     this.name = username;
     this.email = email;
     this.cart = cart; //{items: []}
-    this.id = id;
+    this._id = id;
   }
 
-  save(){
+  save() {
     const db = getDb();
     return db.collection('users').insertOne(this);
   }
@@ -46,7 +46,7 @@ class User {
     const db = getDb();
     return db
       .collection('users')
-      .find({ _id: new mongodb.ObjectId(userId) })
+      .find({ _id: new ObjectId(userId) })
       .next()
       .then(user => {
         console.log(user);
@@ -56,7 +56,7 @@ class User {
         console.log(err);
       });
   }
-  
+
 }
 
 module.exports = User;

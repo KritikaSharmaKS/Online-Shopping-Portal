@@ -31,7 +31,7 @@ let _db;
 
 const mongoConnect = (callback) => {
     MongoClient
-        .connect('mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/<dbname>?retryWrites=true&w=majority')
+        .connect('mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/shopDB?retryWrites=true&w=majority')
         .then(client => {
             console.log('Connected to MongoDB Server');
             _db = client.db();

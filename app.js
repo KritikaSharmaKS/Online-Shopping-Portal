@@ -19,13 +19,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById('5f3978644a538e59210f30d0')
-      .then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
-        next();
-      })
-      .catch(err => console.log(err));
-  });
+  User.findById('5f5977ef5f45cfd9a4f535b1')
+    .then(user => {
+      req.user = new User(user.name, user.email, user.cart, user._id);
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -33,5 +33,5 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoConnect(() => {
-    app.listen(3000);
+  app.listen(3000);
 });
