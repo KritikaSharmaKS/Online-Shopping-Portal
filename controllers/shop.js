@@ -84,7 +84,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   req.user
-    .getOrders({include: ['products']})
+    .getOrders()
     .then(orders => {
       res.render('shop/orders', {
         path: '/orders',

@@ -98,11 +98,13 @@ class User {
       });
   }
 
-  // getOrders() {
-  //   const db = getDb();
-  //   return db
-  //     .collection("orders").findA
-  // }
+  getOrders() {
+    const db = getDb();
+    return db
+      .collection("orders")
+      .find({ "user._id": new ObjectId(this._id) })
+      .toArray();
+  }
 
   static findById(userId) {
     const db = getDb();
