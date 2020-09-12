@@ -1,5 +1,5 @@
 const getDb = require("../util/database").getDb;
-const { ObjectId } = require("mongodb");
+const { ObjectId, ResumeToken } = require("mongodb");
 
 class User {
   constructor(username, email, cart, id) {
@@ -72,6 +72,22 @@ class User {
         { _id: new ObjectId(this._id) },
         { $set: { cart: { items: updatedCartItems } } }
       );
+  }
+
+  addOrder() {
+    const db = getDb();
+    return db
+      .collection("orders")
+      .insertOne(this.cart)
+      .then((result) => {
+        this.cart = { items: [] };
+        return db
+          .collection("users")
+          .updateOne(
+            { _id: new ObjectId(this._id) },
+            { $set: { cart: this.cart } }
+          );
+      });
   }
 
   static findById(userId) {
