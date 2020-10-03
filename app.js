@@ -36,7 +36,8 @@ app.use(errorController.get404);
 
 mongoose
   .connect(
-    "mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/shopDB?retryWrites=true&w=majority"
+    "mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/shopDB?retryWrites=true&w=majority",
+    { useUnifiedTopology: true, useNewUrlParser: true }
   )
   .then((result) => {
     User.findOne().then((user) => {
