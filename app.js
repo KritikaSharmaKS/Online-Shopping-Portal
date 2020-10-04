@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const session = require("express-session");
 
 const User = require("./models/user");
 const errorController = require("./controllers/error");
@@ -13,11 +14,18 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 
 const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop"); 
-const authRoutes = require("./routes/auth"); 
+const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: "my secret password",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 app.use((req, res, next) => {
   User.findById("5f5d9770b118fa038ba804b1")
@@ -43,9 +51,9 @@ mongoose
     User.findOne().then((user) => {
       if (!user) {
         const user = new User({
-          name: 'KS',
-          email: 'ks@gmail.com',
-          cart: []
+          name: "KS",
+          email: "ks@gmail.com",
+          cart: [],
         });
         user.save();
       }
