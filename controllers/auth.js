@@ -16,11 +16,21 @@ exports.postLogin = (req, res, next) => {
       req.session.isLoggedIn = true;
       req.session.save((err) => {
         console.log(err);
-        res.redirect("/");
+      res.redirect("/");
       });
     })
     .catch((err) => console.log(err));
 };
+
+exports.getSignup = (req, res, next) => {
+  res.render('auth/signup', {
+    path: '/signup',
+    pageTitle: 'Signup',
+    isAuthenticated: false
+  });
+};
+
+exports.postSignup = (req, res, next) => {};
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
