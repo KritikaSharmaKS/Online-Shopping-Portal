@@ -16,7 +16,7 @@ exports.postLogin = (req, res, next) => {
     User.findOne({ email }).then(user => {
         if (!user) {
             req.flash('error', "Invalid email or password");
-            res.redirect('/login');
+            return res.redirect('/login');
         }
         bcrypt
             .compare(password, user.password)
