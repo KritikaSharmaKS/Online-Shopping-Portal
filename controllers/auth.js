@@ -1,13 +1,15 @@
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
+const crypto = require("crypto");
 
 const User = require("../models/user");
+const { use } = require("../routes/shop");
 
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
-      api_key: process.env.SENDGRID_API_KEY
+      api_key: process.env.SENDGRID_API_KEY,
     },
   })
 );
@@ -111,15 +113,47 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getReset = (req, res, next) => {
-    let message = req.flash("error");
-    if (message.length) {
-      message = message[0];
-    } else {
-      message = null;
+  let message = req.flash("error");
+  if (message.length) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  res.render("auth/reset", {
+    pageTitle: "Reset Password",
+    path: "/reset",
+    errorMessage: message,
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/reset");
     }
-    res.render("auth/reset", {
-        pageTitle: "Reset Password",
-        path: "/reset",
-        errorMessage: message
-    });
+    const token = buffer.toString("hex");
+    User.findOne({ email: req.body.email })
+      .then(user => {
+          if (!user) {
+            req.flash("error", "No account found with this email.");
+            return res.redirect("/reset");
+          }
+          user.resetToken = token;
+          user.resetTokenExpiration = Data.now() + 3600000;
+          return user.save();
+      })
+      .then(result => {
+          return transporter.sendMail({
+            to: req.body.email,
+            from: "kritikasharma462@gmail.com",
+            subject: "Password Reset",
+            html: `
+                <p>You requested password reset!</p>
+                <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+            `
+          })
+      })
+      .catch((err) => console.log(err));
+  });
 };
