@@ -105,3 +105,4 @@ dist
 
 # apple
 .DS_Store
+sendgrid.env
