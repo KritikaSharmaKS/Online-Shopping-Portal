@@ -134,25 +134,25 @@ exports.postReset = (req, res, next) => {
     }
     const token = buffer.toString("hex");
     User.findOne({ email: req.body.email })
-      .then(user => {
-          if (!user) {
-            req.flash("error", "No account found with this email.");
-            return res.redirect("/reset");
-          }
-          user.resetToken = token;
-          user.resetTokenExpiration = Data.now() + 3600000;
-          return user.save();
+      .then((user) => {
+        if (!user) {
+          req.flash("error", "No account found with this email.");
+          return res.redirect("/reset");
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
       })
-      .then(result => {
-          return transporter.sendMail({
-            to: req.body.email,
-            from: "kritikasharma462@gmail.com",
-            subject: "Password Reset",
-            html: `
+      .then((result) => {
+        transporter.sendMail({
+          to: req.body.email,
+          from: "kritikasharma462@gmail.com",
+          subject: "Password Reset",
+          html: `
                 <p>You requested password reset!</p>
                 <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
-            `
-          })
+            `,
+        });
       })
       .catch((err) => console.log(err));
   });
