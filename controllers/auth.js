@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const crypto = require("crypto");
 
-const { validationResult } = require('express-validator');
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const user = require("../models/user");
@@ -81,38 +81,30 @@ exports.postSignup = (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-      return res.status(422).render("auth/signup", {
-        path: "/signup",
-        pageTitle: "Signup",
-        errorMessage: errors.array()[0].msg,
-      });
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+    });
   }
-  User.findOne({ email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash("error", "E-Mail already exists");
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
-        })
-        .then((result) => {
-          res.redirect("/login");
-          return transporter.sendMail({
-            to: email,
-            from: "kritikasharma462@gmail.com",
-            subject: "Let's Get Shopping",
-            html: "<h1>You Successfully Signed Up</h1>",
-          });
-        })
-        .catch((err) => console.log(err));
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+      return transporter.sendMail({
+        to: email,
+        from: "kritikasharma462@gmail.com",
+        subject: "Let's Get Shopping",
+        html: "<h1>You Successfully Signed Up</h1>",
+      });
     })
     .catch((err) => console.log(err));
 };
@@ -188,34 +180,33 @@ exports.getNewPassword = (req, res, next) => {
         path: "/new-password",
         errorMessage: message,
         userId: user._id.toString(),
-        passwordToken: token
+        passwordToken: token,
       });
     })
     .catch((err) => console.log(err));
 };
 
 exports.postNewPassword = (req, res, next) => {
-    const { password, userId, passwordToken } = req.body;
-    let resetUser;
+  const { password, userId, passwordToken } = req.body;
+  let resetUser;
 
-    User.findOne({
-        resetToken: passwordToken,
-        resetTokenExpiration: { $gt: Date.now() },
-        _id: userId
+  User.findOne({
+    resetToken: passwordToken,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId,
+  })
+    .then((user) => {
+      resetUser = user;
+      return bcrypt.hash(password, 12);
     })
-    .then(user => {
-        resetUser = user;
-        return bcrypt.hash(password, 12)
+    .then((hashedPassword) => {
+      resetUser.password = hashedPassword;
+      resetUser.passwordToken = undefined;
+      resetUser.resetTokenExpiration = undefined;
+      return resetUser.save();
     })
-    .then(hashedPassword => {
-        resetUser.password = hashedPassword;
-        resetUser.passwordToken = undefined;
-        resetUser.resetTokenExpiration = undefined;
-        return resetUser.save();
-    })
-    .then(result => {
-        res.redirect('/login');
+    .then((result) => {
+      res.redirect("/login");
     })
     .catch((err) => console.log(err));
-
 };
