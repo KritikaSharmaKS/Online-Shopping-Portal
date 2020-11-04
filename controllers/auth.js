@@ -3,6 +3,8 @@ const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const crypto = require("crypto");
 
+const { validationResult } = require('express-validator');
+
 const User = require("../models/user");
 const user = require("../models/user");
 
@@ -77,6 +79,14 @@ exports.getSignup = (req, res, next) => {
 
 exports.postSignup = (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(422).render("auth/signup", {
+        path: "/signup",
+        pageTitle: "Signup",
+        errorMessage: errors.array(),
+      });
+  }
   User.findOne({ email })
     .then((userDoc) => {
       if (userDoc) {
