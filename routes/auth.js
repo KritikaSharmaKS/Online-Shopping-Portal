@@ -9,7 +9,12 @@ const router = express.Router();
 router.get("/login", authController.getLogin);
 router.post("/login", authController.postLogin);
 
-router.post("/logout", authController.postLogout);
+router.post("/logout", [
+    body("email").isEmail().withMessage("Please enter a valid email."),
+    body("password", "Password should be alphanumeric with atleast 5 characters")
+    .isLength({min:5})
+    .isAlphanumeric(),
+], authController.postLogout);
 
 router.get("/signup", authController.getSignup);
 router.post(
