@@ -44,7 +44,7 @@ exports.postAddProduct = (req, res, next) => {
     });
   }
   const product = new Product({
-    title2: title,
+    title,
     price,
     description,
     imageUrl,
@@ -58,21 +58,9 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      res.redirect('/500');
-      // return res.status(500).render("admin/edit-product", {
-      //   pageTitle: "Add Product",
-      //   path: "/admin/add-product",
-      //   editing: false,
-      //   product: {
-      //     title,
-      //     imageUrl,
-      //     price,
-      //     description,
-      //   },
-      //   hasError: true,
-      //   errorMessage: "Database Operation Failed",
-      //   validationErrors: []
-      // });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
