@@ -12,12 +12,12 @@ const User = require("./models/user");
 const errorController = require("./controllers/error");
 
 const MONGODB_URI =
-    "mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/shopDB?retryWrites=true&w=majority";
+  "mongodb+srv://kritikasharma:QazFBmIiD3swPzhc@online-shopping-portal.h6buw.mongodb.net/shopDB?retryWrites=true&w=majority";
 
 const app = express();
 const store = new MongoDBStore({
-    uri: MONGODB_URI,
-    collection: "sessions",
+  uri: MONGODB_URI,
+  collection: "sessions",
 });
 
 const csrfProtection = csrf();
@@ -32,39 +32,40 @@ const authRoutes = require("./routes/auth");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
-    session({
-        secret: "my secret password",
-        resave: false,
-        saveUninitialized: false,
-        store: store,
-    })
+  session({
+    secret: "my secret password",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
 );
 
 app.use(flash());
 app.use(csrfProtection);
 
 app.use((req, res, next) => {
-    if (req.session.user) {
-        User.findById(req.session.user._id)
-            .then((user) => {
-            if(!user){
-                return next();
-            }
-            req.user = user;
-            next();
-            })
-            .catch((err) => {
-                throw new Error(err);
-            });
-    } else {
-        next();
-    }
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 app.use((req, res, next) => {
-    res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
+//   throw new Error("Sync Dummy Error");
+  if (req.session.user) {
+    User.findById(req.session.user._id)
+      .then((user) => {
+        if (!user) {
+          return next();
+        }
+        req.user = user;
+        next();
+      })
+      .catch((err) => {
+        return next(new Error(err));
+      });
+  } else {
     next();
+  }
 });
 
 app.use("/admin", adminRoutes);
@@ -76,16 +77,21 @@ app.use("/500", errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-    res.redirect('/500');
+  //   res.redirect("/500");
+  res.status(500).render("500", {
+    pageTitle: "Error",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
 });
 
 mongoose
-    .connect(MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
-    .then((result) => {
-        app.listen(3000);
-    })
-    .catch((err) => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-      });
+  .connect(MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  });
