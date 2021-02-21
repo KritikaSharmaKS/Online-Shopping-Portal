@@ -30,6 +30,15 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
+const fileStorage = multer.fileStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  }
+});
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({dest: 'images'}).single('image'));
 app.use(express.static(path.join(__dirname, "public")));
