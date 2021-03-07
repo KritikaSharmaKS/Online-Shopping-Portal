@@ -36,11 +36,23 @@ const fileStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, new Date().toISOString() + "-" + file.originalname);
-  }
+  },
 });
 
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({storage: fileStorage}).single('image'));
+app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
@@ -61,7 +73,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-//   throw new Error("Sync Dummy Error");
+  //   throw new Error("Sync Dummy Error");
   if (req.session.user) {
     User.findById(req.session.user._id)
       .then((user) => {
@@ -88,7 +100,6 @@ app.use("/500", errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-  //   res.redirect("/500");
   res.status(500).render("500", {
     pageTitle: "Error",
     path: "/500",
