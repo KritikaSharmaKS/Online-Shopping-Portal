@@ -62,7 +62,7 @@ exports.postAddProduct = (req, res, next) => {
     title,
     price,
     description,
-    imageUrl: imagePath,
+    imageUrl: "/"+imagePath,
     userId: req.user,
   }); //Mongoose picks the id automatically
   product
@@ -143,7 +143,7 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       if (image != null) {
-        product.imageUrl = image.path;
+        product.imageUrl = "/"+image.path;
       }
       return product.save().then((result) => {
         console.log("UPDATED PRODUCT!");
