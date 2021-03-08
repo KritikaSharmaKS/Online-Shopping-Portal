@@ -2,6 +2,8 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 const fs = require("fs");
 const path = require("path");
+const PDFDocument = require("pdfkit");
+
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -81,16 +83,14 @@ exports.getInvoice = (req, res, next) => {
     }
     const invoiceName = "invoice-" + orderId + ".pdf";
     const invoicePath = path.join("data", "invoices", invoiceName);
-    // fs.readFile(invoicePath, (err, data) => {
-    //   if (err) return next(err);
-    //   res.setHeader("Content-Type", "application/pdf");
-    //   res.setHeader("Content-Disposition", "attachement; filename = " + invoiceName);
-    //   res.send(data);
-    // });
-    const file = fs.createReadStream(invoicePath);
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "inline; filename = " + invoiceName);
-    file.pipe(res);
+
+     const pdfDoc = new PDFDocument();
+     pdfDoc.pipe(fs.createWriteStream(invoicePath));
+     res.setHeader("Content-Type", "application/pdf");
+     res.setHeader("Content-Disposition", "inline; filename = " + invoiceName);
+     pdfDoc.pipe(res);
+     pdfDoc.text("Hello WOrld!!!");
+     pdfDoc.end();
   }).catch(err => {
       const error = new Error(err);
       error.httpStatusCode = 500;
