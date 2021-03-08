@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 
 const product = require("../models/product");
 const Product = require("../models/product");
-
+const fileHelper = require("../util/file");
 const ObjectId = mongodb.ObjectId;
 
 exports.getAddProduct = (req, res, next) => {
@@ -16,7 +16,7 @@ exports.getAddProduct = (req, res, next) => {
     editing: false,
     hasError: false,
     errorMessage: null,
-    validationErrors: []
+    validationErrors: [],
   });
 };
 
@@ -37,7 +37,7 @@ exports.postAddProduct = (req, res, next) => {
       },
       hasError: true,
       errorMessage: "Attached file is not an image.",
-      validationErrors: []
+      validationErrors: [],
     });
   }
   let imagePath = image.path;
@@ -55,14 +55,14 @@ exports.postAddProduct = (req, res, next) => {
       },
       hasError: true,
       errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
+      validationErrors: errors.array(),
     });
   }
   const product = new Product({
     title,
     price,
     description,
-    imageUrl: "/"+imagePath,
+    imageUrl: "/" + imagePath,
     userId: req.user,
   }); //Mongoose picks the id automatically
   product
@@ -97,7 +97,7 @@ exports.getEditProduct = (req, res, next) => {
         product: product,
         hasError: false,
         errorMessage: null,
-        validationErrors: []
+        validationErrors: [],
       });
     })
     .catch((err) => {
@@ -126,7 +126,7 @@ exports.postEditProduct = (req, res, next) => {
         title: updatedTitle,
         price: updatedPrice,
         description: updatedDesc,
-        _id : prodId
+        _id: prodId,
       },
       hasError: true,
       validationErrors: errors.array(),
@@ -143,7 +143,9 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       if (image != null) {
-        product.imageUrl = "/"+image.path;
+        product.imageUrl = product.imageUrl.replace("/", "");
+        fileHelper.deleteFile(product.imageUrl);
+        product.imageUrl = "/" + image.path;
       }
       return product.save().then((result) => {
         console.log("UPDATED PRODUCT!");
@@ -175,7 +177,13 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({ _id: prodId, userId: req.user._id })
+  Product.findById(prodId)
+    .then((product) => {
+      if (product == null) return next(new Error("Product Not Found."));
+      product.imageUrl = product.imageUrl.replace("/", "");
+      fileHelper.deleteFile(product.imageUrl);
+      return Product.deleteOne({ _id: prodId, userId: req.user._id });
+    })
     .then(() => {
       console.log("DESTROYED PRODUCT");
       res.redirect("/admin/products");
