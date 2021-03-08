@@ -89,7 +89,16 @@ exports.getInvoice = (req, res, next) => {
      res.setHeader("Content-Type", "application/pdf");
      res.setHeader("Content-Disposition", "inline; filename = " + invoiceName);
      pdfDoc.pipe(res);
-     pdfDoc.text("Hello WOrld!!!");
+     pdfDoc.fontSize(26).text('Invoice', {
+       underline: false
+     });
+     pdfDoc.text('-------------------------------------------------');
+     let total = 0;
+     order.products.forEach(prod => {
+       pdfDoc.fontSize(18).text(prod.product.title + " - " + prod.quantity + " x $" + prod.product.price);
+       total = total + prod.quantity * prod.product.price;
+     });
+     pdfDoc.fontSize(20).text("\n TOTAL PRICE = $" + total);
      pdfDoc.end();
   }).catch(err => {
       const error = new Error(err);
