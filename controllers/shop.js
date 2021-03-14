@@ -41,14 +41,26 @@ exports.getProduct = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   const page = req.query.page;
-  Product.find()
-    .skip((page - 1) * ITEMS_PER_PAGE)
-    .limit(ITEMS_PER_PAGE)
+  let totalProducts;
+
+  Product.countDocuments()
+    .then((numberOfProducts) => {
+      totalProducts = numberOfProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
         path: "/",
+        totalProducts,
+        hasNextPage: ITEMS_PER_PAGE * page < totalProducts,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalProducts / ITEMS_PER_PAGE)
       });
     })
     .catch((err) => {
@@ -78,37 +90,47 @@ exports.getCart = (req, res, next) => {
 
 exports.getInvoice = (req, res, next) => {
   const orderId = req.params.orderId;
-  Order.findById(orderId).then(order => {
-    if (order == null) {
-      return next(new Error("Order Not Found."));
-    }
-    if (order.user.userId.toString() !== req.user._id.toString()) {
-      return next(new Error("Unauthorized."));
-    }
-    const invoiceName = "invoice-" + orderId + ".pdf";
-    const invoicePath = path.join("data", "invoices", invoiceName);
+  Order.findById(orderId)
+    .then((order) => {
+      if (order == null) {
+        return next(new Error("Order Not Found."));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Unauthorized."));
+      }
+      const invoiceName = "invoice-" + orderId + ".pdf";
+      const invoicePath = path.join("data", "invoices", invoiceName);
 
-     const pdfDoc = new PDFDocument();
-     pdfDoc.pipe(fs.createWriteStream(invoicePath));
-     res.setHeader("Content-Type", "application/pdf");
-     res.setHeader("Content-Disposition", "inline; filename = " + invoiceName);
-     pdfDoc.pipe(res);
-     pdfDoc.fontSize(26).text('Invoice', {
-       underline: false
-     });
-     pdfDoc.text('-------------------------------------------------');
-     let total = 0;
-     order.products.forEach(prod => {
-       pdfDoc.fontSize(18).text(prod.product.title + " - " + prod.quantity + " x $" + prod.product.price);
-       total = total + prod.quantity * prod.product.price;
-     });
-     pdfDoc.fontSize(20).text("\n TOTAL PRICE = $" + total);
-     pdfDoc.end();
-  }).catch(err => {
+      const pdfDoc = new PDFDocument();
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "inline; filename = " + invoiceName);
+      pdfDoc.pipe(res);
+      pdfDoc.fontSize(26).text("Invoice", {
+        underline: false,
+      });
+      pdfDoc.text("-------------------------------------------------");
+      let total = 0;
+      order.products.forEach((prod) => {
+        pdfDoc
+          .fontSize(18)
+          .text(
+            prod.product.title +
+              " - " +
+              prod.quantity +
+              " x $" +
+              prod.product.price
+          );
+        total = total + prod.quantity * prod.product.price;
+      });
+      pdfDoc.fontSize(20).text("\n TOTAL PRICE = $" + total);
+      pdfDoc.end();
+    })
+    .catch((err) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
-  });
+    });
 };
 
 exports.postCart = (req, res, next) => {
