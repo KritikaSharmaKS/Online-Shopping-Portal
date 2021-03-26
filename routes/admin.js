@@ -30,6 +30,6 @@ router.post('/edit-product/', auth, [
     body('description').trim().isLength({min: 5, max: 400})
 ], adminController.postEditProduct);
 
-router.post('/delete-product/', auth, adminController.postDeleteProduct);
+router.delete('/product/:productId', auth, adminController.deleteProduct);
 
 module.exports = router;
